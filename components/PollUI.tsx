@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from "react";
 import { Poll, Option } from "@/lib/types";
-import VoteInterface from "./VoteInterface";
-import ShareLink from "./ShareLink";
-import LiveResults from "./LiveResults";
+import VoteInterface from "./VoteInterface"; // We will build this next
+import LiveResults from "./LiveResults";     // We will build this next
+import ShareLink from "./ShareLink";         // We will build this next
 
 interface PollUIProps {
   poll: Poll;
@@ -17,13 +17,12 @@ export default function PollUI({ poll, initialOptions }: PollUIProps) {
 
   // Fairness Mechanism #1: Check LocalStorage on mount
   useEffect(() => {
-  const checkVote = () => {
     const localVote = localStorage.getItem(`poll_voted_${poll.id}`);
-    if (localVote) setHasVoted(true);
-  };
-
-  checkVote();
-}, [poll.id]);
+    if (localVote) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHasVoted(true);
+    }
+  }, [poll.id]);
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-lg mt-10">

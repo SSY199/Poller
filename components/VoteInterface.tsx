@@ -28,19 +28,20 @@ export default function VoteInterface({
         body: JSON.stringify({ pollId: poll.id, optionId }),
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to vote");
+      }
 
-      if (!response.ok) throw new Error(data.error || "Failed to vote");
-
+      //const data = await response.json();
       localStorage.setItem(`poll_voted_${poll.id}`, "true");
 
       toast.success("Vote Successful! Thank you for voting.");
 
       onVoteSuccess();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message || "Vote Failed. Something went wrong.");
-      
     } finally {
       setIsVoting(false);
     }
