@@ -105,7 +105,7 @@ export default function CreatePollForm() {
           type="button"
           variant="ghost"
           onClick={addOption}
-          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 w-full"
+          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 w-full cursor-pointer"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add another option
