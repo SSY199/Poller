@@ -2,125 +2,148 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
-import { Input } from "./ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CreatePollForm() {
-  const router = useRouter();
   const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", ""]); // Start with 2 empty options
+  const [options, setOptions] = useState(["", ""]); 
   const [loading, setLoading] = useState(false);
+  const [pollLink, setPollLink] = useState(""); // Simple state to hold the link
 
-  // Handle adding a new option input
-  const addOption = () => {
-    setOptions([...options, ""]);
-  };
+  // Add a new empty option
+  const addOption = () => setOptions([...options, ""]);
 
-  // Handle changing text in an option input
+  // Update option text
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...options];
     newOptions[index] = value;
     setOptions(newOptions);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    // Basic Validation
     const validOptions = options.filter((opt) => opt.trim() !== "");
-    if (!question.trim()) {
-      alert("Oops, you forgot something! Please enter a question for your poll.");
-      setLoading(false);
-      return;
-    }
-    if(validOptions.length < 2) {
-      alert("Oops, you forgot something! Please enter at least 2 options for your poll.");
+    if (!question.trim() || validOptions.length < 2) {
+      alert("Please enter a question and at least 2 options.");
       setLoading(false);
       return;
     }
 
     try {
-      //  Insert Poll
-      const { data: pollData, error: pollError } = await supabase
+      // 1. Create Poll
+      const { data: poll } = await supabase
         .from("polls")
         .insert([{ question }])
         .select()
         .single();
 
-      if (pollError) throw pollError;
+      if (!poll) throw new Error("Failed to create poll");
 
+      // 2. Add Options
       const optionsData = validOptions.map((opt) => ({
-        poll_id: pollData.id,
+        poll_id: poll.id,
         option_text: opt,
       }));
 
-      const { error: optionsError } = await supabase
-        .from("options")
-        .insert(optionsData);
+      await supabase.from("options").insert(optionsData);
 
-      if (optionsError) throw optionsError;
+      // 3. Generate Link (Don't redirect, just show it)
+      const link = `${window.location.origin}/poll/${poll.id}`;
+      setPollLink(link);
 
-
-      router.push(`/poll/${pollData.id}`);
     } catch (error) {
-      console.error("Error creating poll:", error);
-      alert("Something went wrong!");
+      console.error(error);
+      alert("Error creating poll");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Create a Poll</h2>
-      
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Question</label>
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black"
-          placeholder="What question do you want to ask?"
-          required
-        />
-      </div>
-
-      {/* Options Inputs */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
-        {options.map((opt, index) => (
-          <Input
-            key={index}
-            type="text"
-            value={opt}
-            onChange={(e) => handleOptionChange(index, e.target.value)}
-            className="w-full p-2 mb-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 outline-none text-black"
-            placeholder={`Option ${index + 1}`}
-            required={index < 2} 
+  // --- Success View (Simple) ---
+  if (pollLink) {
+    return (
+      <Card className="w-full max-w-md mx-auto shadow-md border-2 border-green-500">
+        <CardHeader>
+          <CardTitle className="text-center text-green-700">Poll Created!</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-center text-gray-600">
+            Copy this link and share it with others:
+          </p>
+          
+          <Input 
+            readOnly 
+            value={pollLink} 
+            className="text-center font-mono bg-gray-50 cursor-text"
+            onClick={(e) => e.currentTarget.select()} // Auto-select text on click
           />
-        ))}
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={addOption}
-          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 w-full cursor-pointer"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add another option
-        </Button>
-      </div>
+          
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700"
+            onClick={() => navigator.clipboard.writeText(pollLink)}
+          >
+            Copy Link
+          </Button>
 
-      {/* Submit Button */} 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:bg-gray-400 cursor-pointer"
-      >
-        {loading ? "Creating..." : "Create Poll"}
-      </Button>
-    </form>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => window.open(pollLink, '_blank')}
+          >
+            Open in New Tab
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // --- Form View (Standard) ---
+  return (
+    <Card className="w-full max-w-md mx-auto shadow-lg">
+      <CardHeader>
+        <CardTitle className="text-center">Create a New Poll</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Question</label>
+            <Input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="What's your question?"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Options</label>
+            {options.map((opt, index) => (
+              <Input
+                key={index}
+                value={opt}
+                onChange={(e) => handleOptionChange(index, e.target.value)}
+                placeholder={`Option ${index + 1}`}
+                className="mb-2"
+                required={index < 2}
+              />
+            ))}
+            <Button type="button" variant="ghost" onClick={addOption} className="w-full">
+              + Add Option
+            </Button>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Creating..." : "Generate Link"}
+          </Button>
+
+        </form>
+      </CardContent>
+    </Card>
   );
 }
