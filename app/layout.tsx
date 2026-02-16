@@ -30,7 +30,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        {/* Simple toast container for vote success / errors */}
         <Toaster />
       </body>
     </html>

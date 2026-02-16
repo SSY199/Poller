@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, Copy } from "lucide-react"; // Shadcn usually installs Lucide icons
-import { Input } from "@/components/ui/input"; // Optional: if you installed 'input'
+import { Check, Copy } from "lucide-react"; 
+import { Input } from "@/components/ui/input"; 
 
 export default function ShareLink() {
   const [copied, setCopied] = useState(false);
   
-  // Safe access to window location
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const copyToClipboard = () => {

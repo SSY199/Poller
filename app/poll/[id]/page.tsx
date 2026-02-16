@@ -4,20 +4,19 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-// FIX 1: Update type definition to Promise
+
 export default async function PollPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   
-  // FIX 2: You MUST await params before using the ID
   const { id } = await params;
 
   const { data: poll, error: pollError } = await supabase
     .from("polls")
     .select("*")
-    .eq("id", id) // Use the awaited 'id' variable here
+    .eq("id", id)
     .single();
 
   if (pollError || !poll) {
@@ -27,7 +26,7 @@ export default async function PollPage({
   const { data: options, error: optionsError } = await supabase
     .from("options")
     .select("*")
-    .eq("poll_id", id) // Use the awaited 'id' variable here
+    .eq("poll_id", id)
     .order("vote_count", { ascending: false });
 
   if (optionsError) {

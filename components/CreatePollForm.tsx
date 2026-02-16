@@ -10,12 +10,10 @@ export default function CreatePollForm() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [loading, setLoading] = useState(false);
-  const [pollLink, setPollLink] = useState(""); // Simple state to hold the link
+  const [pollLink, setPollLink] = useState(""); 
 
-  // Add a new empty option
   const addOption = () => setOptions([...options, ""]);
 
-  // Update option text
   const handleOptionChange = (index: number, value: string) => {
     const newOptions = [...options];
     newOptions[index] = value;
@@ -26,7 +24,6 @@ export default function CreatePollForm() {
     e.preventDefault();
     setLoading(true);
 
-    // Basic Validation
     const validOptions = options.filter((opt) => opt.trim() !== "");
     if (!question.trim() || validOptions.length < 2) {
       alert("Please enter a question and at least 2 options.");
@@ -35,7 +32,6 @@ export default function CreatePollForm() {
     }
 
     try {
-      // 1. Create Poll
       const { data: poll, error: pollError } = await supabase
         .from("polls")
         .insert([{ question }])
@@ -44,7 +40,7 @@ export default function CreatePollForm() {
 
       if (pollError || !poll)
         throw new Error(pollError?.message || "Failed to create poll");
-      // 2. Add Options
+
       const optionsData = validOptions.map((opt) => ({
         poll_id: poll.id,
         option_text: opt,
@@ -52,7 +48,6 @@ export default function CreatePollForm() {
 
       await supabase.from("options").insert(optionsData);
 
-      // 3. Generate Link (Don't redirect, just show it)
       const link = `${window.location.origin}/poll/${poll.id}`;
       setPollLink(link);
     } catch (error) {
@@ -63,7 +58,6 @@ export default function CreatePollForm() {
     }
   };
 
-  // --- Success View (Simple) ---
   if (pollLink) {
     return (
       <Card className="w-full max-w-md mx-auto shadow-md border-2 border-green-500">
@@ -103,7 +97,6 @@ export default function CreatePollForm() {
     );
   }
 
-  // --- Form View (Standard) ---
   return (
     <Card className="w-full max-w-md mx-auto shadow-lg">
       <CardHeader>

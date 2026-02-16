@@ -11,7 +11,6 @@ export interface Option {
   vote_count: number;
 }
 
-// FIXED: Renamed ip_address to ip_hash
 export interface PollVote {
   id: string;
   poll_id: string;

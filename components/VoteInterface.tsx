@@ -33,7 +33,6 @@ export default function VoteInterface({
         throw new Error(data.error || "Failed to vote");
       }
 
-      //const data = await response.json();
       localStorage.setItem(`poll_voted_${poll.id}`, "true");
 
       toast.success("Vote Successful! Thank you for voting.");
@@ -57,7 +56,6 @@ export default function VoteInterface({
         <p className="text-sm text-slate-500 mt-1">Select an option below</p>
       </div>
 
-      {/* Options List */}
       <div className="grid gap-3">
         {options.map((option) => (
           <Button

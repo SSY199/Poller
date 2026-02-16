@@ -60,7 +60,7 @@ I kept the fairness logic simple but it still stops basic abuse:
 
 - Next.js (App Router)
 - React
-- Tailwind CSS
+- ShadCn UI
 
 **Backend**
 
@@ -126,6 +126,3 @@ This project demonstrates:
 - Persistent data modeling
 - Production-ready deployment
 
-```
-
-```

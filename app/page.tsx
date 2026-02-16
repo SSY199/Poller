@@ -5,7 +5,6 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-8">
         
-        {/* Header Section */}
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
             Real-Time Polls
@@ -15,10 +14,8 @@ export default function Home() {
           </p>
         </div>
 
-        {/* The Form Component */}
         <CreatePollForm />
 
-        {/* Footer / Instructions */}
         <div className="text-center text-sm text-gray-500 mt-8">
           <p>
             Built for the <span className="font-semibold text-blue-600">Full-Stack Assignment</span>.
