@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
+import { Input } from "./ui/input";
 
 export default function CreatePollForm() {
   const router = useRouter();
@@ -91,7 +92,7 @@ export default function CreatePollForm() {
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">Options</label>
         {options.map((opt, index) => (
-          <input
+          <Input
             key={index}
             type="text"
             value={opt}

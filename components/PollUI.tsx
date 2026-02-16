@@ -1,11 +1,10 @@
-// components/PollUI.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { Poll, Option } from "@/lib/types";
-import VoteInterface from "./VoteInterface"; // We will build this next
-import LiveResults from "./LiveResults";     // We will build this next
-import ShareLink from "./ShareLink";         // We will build this next
+import VoteInterface from "./VoteInterface"; 
+import LiveResults from "./LiveResults";
+import ShareLink from "./ShareLink";    
 
 interface PollUIProps {
   poll: Poll;
