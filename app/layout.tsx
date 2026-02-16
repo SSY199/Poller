@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Poller",
-  description: "A full-stack web application that allows users to create polls, share them via a link, and view live results as votes are cast — without refreshing the page.",
+  description:
+    "A simple web app to create polls, share them by link, and watch results update in real time.",
 };
 
 export default function RootLayout({
@@ -28,6 +30,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        {/* Simple toast container for vote success / errors */}
+        <Toaster />
       </body>
     </html>
   );

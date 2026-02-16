@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function CreatePollForm() {
   const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", ""]); 
+  const [options, setOptions] = useState(["", ""]);
   const [loading, setLoading] = useState(false);
   const [pollLink, setPollLink] = useState(""); // Simple state to hold the link
 
@@ -36,14 +36,14 @@ export default function CreatePollForm() {
 
     try {
       // 1. Create Poll
-      const { data: poll } = await supabase
+      const { data: poll, error: pollError } = await supabase
         .from("polls")
         .insert([{ question }])
         .select()
         .single();
 
-      if (!poll) throw new Error("Failed to create poll");
-
+      if (pollError || !poll)
+        throw new Error(pollError?.message || "Failed to create poll");
       // 2. Add Options
       const optionsData = validOptions.map((opt) => ({
         poll_id: poll.id,
@@ -55,7 +55,6 @@ export default function CreatePollForm() {
       // 3. Generate Link (Don't redirect, just show it)
       const link = `${window.location.origin}/poll/${poll.id}`;
       setPollLink(link);
-
     } catch (error) {
       console.error(error);
       alert("Error creating poll");
@@ -69,31 +68,33 @@ export default function CreatePollForm() {
     return (
       <Card className="w-full max-w-md mx-auto shadow-md border-2 border-green-500">
         <CardHeader>
-          <CardTitle className="text-center text-green-700">Poll Created!</CardTitle>
+          <CardTitle className="text-center text-green-700">
+            Poll Created!
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-center text-gray-600">
             Copy this link and share it with others:
           </p>
-          
-          <Input 
-            readOnly 
-            value={pollLink} 
+
+          <Input
+            readOnly
+            value={pollLink}
             className="text-center font-mono bg-gray-50 cursor-text"
             onClick={(e) => e.currentTarget.select()} // Auto-select text on click
           />
-          
-          <Button 
+
+          <Button
             className="w-full bg-green-600 hover:bg-green-700"
             onClick={() => navigator.clipboard.writeText(pollLink)}
           >
             Copy Link
           </Button>
 
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full"
-            onClick={() => window.open(pollLink, '_blank')}
+            onClick={() => window.open(pollLink, "_blank")}
           >
             Open in New Tab
           </Button>
@@ -110,7 +111,6 @@ export default function CreatePollForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           <div>
             <label className="block text-sm font-medium mb-1">Question</label>
             <Input
@@ -133,7 +133,12 @@ export default function CreatePollForm() {
                 required={index < 2}
               />
             ))}
-            <Button type="button" variant="ghost" onClick={addOption} className="w-full">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={addOption}
+              className="w-full"
+            >
               + Add Option
             </Button>
           </div>
@@ -141,7 +146,6 @@ export default function CreatePollForm() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating..." : "Generate Link"}
           </Button>
-
         </form>
       </CardContent>
     </Card>

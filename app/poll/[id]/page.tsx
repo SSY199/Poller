@@ -2,30 +2,33 @@ import { supabase } from "@/lib/supabaseClient";
 import PollUI from "@/components/PollUI";
 import { notFound } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-// 1. Update the type: params is now a Promise<{ id: string }>
-export default async function PollPage({ params }: { params: Promise<{ id: string }> }) {
+// FIX 1: Update type definition to Promise
+export default async function PollPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   
-  // 2. Await the params to get the ID
+  // FIX 2: You MUST await params before using the ID
   const { id } = await params;
 
-  // 3. Use 'id' (not params.id) in your queries
   const { data: poll, error: pollError } = await supabase
     .from("polls")
     .select("*")
-    .eq("id", id)
+    .eq("id", id) // Use the awaited 'id' variable here
     .single();
 
   if (pollError || !poll) {
-    notFound(); 
+    notFound();
   }
 
   const { data: options, error: optionsError } = await supabase
     .from("options")
     .select("*")
-    .eq("poll_id", id)
-    .order("vote_count", { ascending: false }); 
+    .eq("poll_id", id) // Use the awaited 'id' variable here
+    .order("vote_count", { ascending: false });
 
   if (optionsError) {
     console.error("Error fetching options:", optionsError);
